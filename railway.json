@@ -1,0 +1,18 @@
+
+{
+  "build": {
+    "nixpacks": {
+      "plan": {
+        "providers": ["python@3.11"]
+      }
+    }
+  },
+  "deploy": {
+    "startCommand": "uvicorn app.main:create_app --factory --host 0.0.0.0 --port ${PORT} --log-level debug --access-log",
+    "healthcheckPath": "/api/healthz",
+    "restartPolicyType": "on_failure"
+  },
+  "variables": {
+    "LOG_LEVEL": "DEBUG"
+  }
+}

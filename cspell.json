@@ -1,0 +1,19 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "dictionaryDefinitions": [
+    {
+      "name": "project-words",
+      "path": "./.cspell/words.txt",
+      "addWords": true
+    }
+  ],
+  "dictionaries": ["project-words"],
+  "ignorePaths": [
+    "**/.venv/**",
+    "**/.ruff_cache/**",
+    "**/.mypy_cache/**",
+    "**/.pytest_cache/**",
+    "**/node_modules/**"
+  ]
+}
