@@ -1,16 +1,4 @@
 # ================================
-# Project Snapshots
-# ================================
-# These are ignored during active development to avoid noisy commits.
-# They will be force-added at milestones (e.g., alpha snapshot).
-/pyproject.toml
-/.cspell/
-.vscode/*
-# !.vscode/
-# !.vscode/settings.json
-# !.vscode/extensions.json
-
-# ================================
 # Build & Packaging Artifacts
 # ================================
 build/
@@ -25,6 +13,7 @@ credentials/
 credentials.json
 secrets.json
 token.json
+CLAUDE.md
 
 # ================================
 # Data and Models
