@@ -4,12 +4,10 @@ Common types and base classes for schema definitions.
 Provides shared types, enums, and models used across multiple schema modules.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
-
 
 # Type alias for UTC timestamps
 Timestamp = datetime
@@ -48,7 +46,7 @@ class Source(BaseModel):
     )
     timestamp: Timestamp = Field(
         description="When this source was ingested",
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
     )
     metadata: dict[str, str] = Field(
         default_factory=dict,
@@ -70,7 +68,7 @@ class Source(BaseModel):
         """Ensure timestamp has timezone info (prefer UTC)."""
         if v.tzinfo is None:
             # Assume UTC if no timezone provided
-            return v.replace(tzinfo=timezone.utc)
+            return v.replace(tzinfo=UTC)
         return v
 
     class Config:

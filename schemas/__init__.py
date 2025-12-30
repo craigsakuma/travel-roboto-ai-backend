@@ -19,15 +19,6 @@ from schemas.messages import (
     ConversationMetadata,
 )
 
-# Trip data schemas
-from schemas.trip import (
-    ActivityInfo,
-    FlightInfo,
-    HotelInfo,
-    TripData,
-    TripMetadata,
-)
-
 # Tool execution schemas
 from schemas.tool_calls import (
     ConflictResolverInput,
@@ -38,6 +29,15 @@ from schemas.tool_calls import (
     EmailParserOutput,
     ToolInput,
     ToolOutput,
+)
+
+# Trip data schemas
+from schemas.trip import (
+    ActivityInfo,
+    FlightInfo,
+    HotelInfo,
+    TripData,
+    TripMetadata,
 )
 
 __all__ = [

@@ -67,9 +67,7 @@ class ToolOutput(BaseModel):
         default=None,
         description="Tool execution result (type depends on tool)",
     )
-    error: str | None = Field(
-        default=None, description="Error message if execution failed"
-    )
+    error: str | None = Field(default=None, description="Error message if execution failed")
     metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional metadata about the execution",
@@ -336,9 +334,7 @@ class ConflictResolverInput(BaseModel):
     about the same travel element (e.g., different flight times).
     """
 
-    trip_id: str = Field(
-        description="Trip ID where conflict exists", examples=["trip_tokyo2025"]
-    )
+    trip_id: str = Field(description="Trip ID where conflict exists", examples=["trip_tokyo2025"])
     conflict_type: str = Field(
         description="Type of conflict (flight, hotel, activity)",
         examples=["flight", "hotel"],
