@@ -9,7 +9,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import ForeignKey, Index, String, Text
+from sqlalchemy import ForeignKey, Index, JSON, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -140,13 +140,13 @@ class Message(Base, TimestampMixin):
 
     # Flexible JSON fields for sources and metadata
     sources: Mapped[list[dict[str, Any]] | None] = mapped_column(
-        JSONB,
+        JSON().with_variant(JSONB(astext_type=Text()), "postgresql"),
         nullable=True,
         doc="Data sources used to generate this message (for assistant responses)",
     )
 
     extra_metadata: Mapped[dict[str, Any]] = mapped_column(
-        JSONB,
+        JSON().with_variant(JSONB(astext_type=Text()), "postgresql"),
         nullable=False,
         default=dict,
         server_default="{}",
