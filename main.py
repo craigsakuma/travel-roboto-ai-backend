@@ -7,7 +7,7 @@ FastAPI application entrypoint for Travel Roboto AI Backend.
 Architecture:
 - Skills-based modular monolith organized by AI capabilities
 - Supports A/B testing for models and prompts
-- Firestore for conversation memory and trip data persistence
+- PostgreSQL for conversation memory and trip data persistence
 """
 
 import logging
@@ -31,7 +31,7 @@ async def lifespan(app: FastAPI):
     Async context manager for application lifespan events.
 
     Handles startup and shutdown tasks like:
-    - Initializing Firestore connection
+    - Initializing database connection pool
     - Warming up model clients
     - Cleanup on shutdown
     """
@@ -41,19 +41,26 @@ async def lifespan(app: FastAPI):
         "Starting Travel Agent API",
         extra={
             "env": settings.app_env,
-            "firestore_project": settings.firestore_project_id,
+            "database": settings.postgres_db,
             "ab_testing_enabled": settings.ab_testing_enabled,
         },
     )
 
     # Startup: Initialize connections
     try:
-        # Initialize Firestore client (lazy initialization pattern)
-        from utils.firestore import get_firestore_client
+        # Initialize database engine and connection pool
+        from db import init_db
 
-        firestore_client = get_firestore_client(settings)
-        app.state.firestore = firestore_client
-        logger.info("Firestore client initialized")
+        engine = init_db(settings)
+        app.state.db_engine = engine
+        logger.info(
+            "Database initialized",
+            extra={
+                "host": settings.postgres_host,
+                "database": settings.postgres_db,
+                "pool_size": settings.postgres_pool_size,
+            },
+        )
 
         # Warm up model providers (optional, improves first request latency)
         if not settings.mock_llm_responses:
@@ -70,7 +77,9 @@ async def lifespan(app: FastAPI):
 
     # Shutdown: Cleanup
     logger.info("Shutting down Travel Agent API")
-    # Firestore client cleanup happens automatically
+    if hasattr(app.state, "db_engine"):
+        await app.state.db_engine.dispose()
+        logger.info("Database connection pool closed")
 
 
 def create_app() -> FastAPI:
