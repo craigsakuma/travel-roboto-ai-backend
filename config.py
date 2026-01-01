@@ -54,8 +54,10 @@ class Settings(BaseSettings):
     postgres_host: str = Field(default="localhost", description="PostgreSQL host address")
     postgres_port: int = Field(default=5432, description="PostgreSQL port", ge=1, le=65535)
     postgres_db: str = Field(default="travelroboto", description="PostgreSQL database name")
-    postgres_user: str = Field(description="PostgreSQL username")
-    postgres_password: SecretStr = Field(description="PostgreSQL password")
+    postgres_user: str = Field(default="postgres", description="PostgreSQL username")
+    postgres_password: SecretStr = Field(
+        default="password", description="PostgreSQL password"
+    )
     postgres_pool_size: int = Field(
         default=20,
         ge=5,
@@ -95,11 +97,11 @@ class Settings(BaseSettings):
         Construct PostgreSQL connection URL for sync operations (e.g., Alembic migrations).
 
         Returns:
-            str: Database URL in format postgresql://user:pass@host:port/db
+            str: Database URL in format postgresql+psycopg://user:pass@host:port/db
         """
         password = self.postgres_password.get_secret_value()
         return (
-            f"postgresql://{self.postgres_user}:{password}"
+            f"postgresql+psycopg://{self.postgres_user}:{password}"
             f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
         )
 

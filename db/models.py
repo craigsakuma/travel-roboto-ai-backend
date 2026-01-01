@@ -145,7 +145,7 @@ class Message(Base, TimestampMixin):
         doc="Data sources used to generate this message (for assistant responses)",
     )
 
-    metadata: Mapped[dict[str, Any]] = mapped_column(
+    extra_metadata: Mapped[dict[str, Any]] = mapped_column(
         JSONB,
         nullable=False,
         default=dict,
