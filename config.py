@@ -50,21 +50,58 @@ class Settings(BaseSettings):
 
         return getattr(logging, self.log_level, logging.INFO)
 
-    # --- Cloud Firestore ---
-    firestore_project_id: str = Field(description="Google Cloud project ID for Firestore.")
-    firestore_credentials_path: Path | None = Field(
-        default=None,
-        description="Path to service account JSON for Firestore. If None, uses default credentials.",
+    # --- PostgreSQL Database ---
+    postgres_host: str = Field(default="localhost", description="PostgreSQL host address")
+    postgres_port: int = Field(default=5432, description="PostgreSQL port", ge=1, le=65535)
+    postgres_db: str = Field(default="travelroboto", description="PostgreSQL database name")
+    postgres_user: str = Field(description="PostgreSQL username")
+    postgres_password: SecretStr = Field(description="PostgreSQL password")
+    postgres_pool_size: int = Field(
+        default=20,
+        ge=5,
+        le=100,
+        description="Database connection pool size",
     )
-    firestore_database: str = Field(
-        default="(default)",
-        description="Firestore database name. Use '(default)' for the default database.",
+    postgres_max_overflow: int = Field(
+        default=10,
+        ge=0,
+        le=50,
+        description="Maximum overflow connections beyond pool_size",
+    )
+    postgres_pool_timeout: int = Field(
+        default=30,
+        ge=5,
+        le=120,
+        description="Connection pool timeout in seconds",
     )
 
     @property
-    def use_firestore_emulator(self) -> bool:
-        """Check if Firestore emulator should be used (dev/test only)."""
-        return self.app_env in {"development", "test"}
+    def database_url(self) -> str:
+        """
+        Construct PostgreSQL connection URL for async SQLAlchemy.
+
+        Returns:
+            str: Database URL in format postgresql+asyncpg://user:pass@host:port/db
+        """
+        password = self.postgres_password.get_secret_value()
+        return (
+            f"postgresql+asyncpg://{self.postgres_user}:{password}"
+            f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+        )
+
+    @property
+    def database_url_sync(self) -> str:
+        """
+        Construct PostgreSQL connection URL for sync operations (e.g., Alembic migrations).
+
+        Returns:
+            str: Database URL in format postgresql://user:pass@host:port/db
+        """
+        password = self.postgres_password.get_secret_value()
+        return (
+            f"postgresql://{self.postgres_user}:{password}"
+            f"@{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
+        )
 
     # --- LLM Provider API Keys ---
     openai_api_key: SecretStr | None = Field(
