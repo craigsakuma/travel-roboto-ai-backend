@@ -6,6 +6,15 @@ from sqlalchemy import engine_from_config, pool
 # Import our models and config
 from config import get_settings
 from db.base import Base
+from db.models import (  # noqa: F401
+    Conversation,
+    LLMRequest,
+    Message,
+    Metric,
+    Trip,
+    TripTraveler,
+    User,
+)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -19,9 +28,6 @@ config.set_main_option("sqlalchemy.url", settings.database_url_sync)
 # This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
-
-# Import all models so Alembic can detect them
-from db.models import Conversation, Message  # noqa: F401
 
 # Set target metadata from our Base
 target_metadata = Base.metadata
