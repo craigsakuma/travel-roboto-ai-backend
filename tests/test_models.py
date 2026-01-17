@@ -4,14 +4,13 @@ Tests model factory, provider initialization, and LLM abstractions.
 """
 
 import pytest
-from langchain_core.messages import HumanMessage
 
 from config import Settings
 from models.base import BaseLLM
 from models.factory import LLMFactory
 from models.providers.anthropic import AnthropicLLM
-from models.providers.openai import OpenAILLM
 from models.providers.google import GoogleLLM
+from models.providers.openai import OpenAILLM
 
 
 @pytest.fixture

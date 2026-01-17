@@ -4,13 +4,12 @@ Tests tool registration, execution, and trip-related tools.
 """
 
 import uuid
-from datetime import date, datetime, timezone
+from datetime import date
 
 import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from db.base import Base
 from db.models import Trip, TripTraveler, User
 from tools import ToolRegistry, get_trip_details, register_trip_tools
 

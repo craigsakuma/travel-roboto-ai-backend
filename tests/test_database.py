@@ -5,15 +5,13 @@ an in-memory SQLite database for fast, isolated testing.
 """
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 import pytest_asyncio
-from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from db.base import Base
-from db.models import Conversation, Message
 from db.repositories import ConversationRepository, MessageRepository
 
 
@@ -224,7 +222,7 @@ class TestMessageRepository:
         await session.commit()
 
         # Create a message
-        timestamp = datetime.now(timezone.utc)
+        timestamp = datetime.now(UTC)
         message = await message_repo.create(
             conversation_id=conversation.id,
             role="user",
@@ -274,13 +272,13 @@ class TestMessageRepository:
             conversation_id=conversation.id,
             role="user",
             content="First message",
-            timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc),
+            timestamp=datetime(2024, 1, 1, 12, 0, 0, tzinfo=UTC),
         )
         msg2 = await message_repo.create(
             conversation_id=conversation.id,
             role="assistant",
             content="Second message",
-            timestamp=datetime(2024, 1, 1, 12, 1, 0, tzinfo=timezone.utc),
+            timestamp=datetime(2024, 1, 1, 12, 1, 0, tzinfo=UTC),
         )
         await session.commit()
 
@@ -323,14 +321,14 @@ class TestMessageRepository:
         )
 
         # Create messages with different timestamps
-        base_time = datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+        base_time = datetime(2024, 1, 1, 12, 0, 0, tzinfo=UTC)
         for i in range(5):
             await message_repo.create(
                 conversation_id=conversation.id,
                 role="user",
                 content=f"Message {i}",
                 timestamp=datetime(
-                    2024, 1, 1, 12, i, 0, tzinfo=timezone.utc
+                    2024, 1, 1, 12, i, 0, tzinfo=UTC
                 ),  # Incrementing minutes
             )
         await session.commit()
