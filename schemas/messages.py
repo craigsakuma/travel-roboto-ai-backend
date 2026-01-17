@@ -7,12 +7,12 @@ Defines data models for:
 - Chat API requests and responses
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from schemas.common import MessageRole, Source, Timestamp
+from schemas.common import Source, Timestamp
 
 
 class ChatMessage(BaseModel):
@@ -33,7 +33,7 @@ class ChatMessage(BaseModel):
     )
     timestamp: Timestamp = Field(
         description="When the message was created",
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
     )
     sources: list[Source] | None = Field(
         default=None,
@@ -97,11 +97,11 @@ class ConversationMetadata(BaseModel):
     user_id: str = Field(description="User who initiated the conversation")
     created_at: Timestamp = Field(
         description="When the conversation was created",
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
     )
     updated_at: Timestamp = Field(
         description="Last message timestamp",
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
     )
     model_used: str = Field(
         description="Primary LLM model used for this conversation",
@@ -210,7 +210,7 @@ class ChatResponse(BaseModel):
     )
     timestamp: Timestamp = Field(
         description="When the response was generated",
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
     )
     sources: list[Source] | None = Field(
         default=None, description="Data sources used to generate the response"

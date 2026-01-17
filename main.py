@@ -114,7 +114,11 @@ def create_app() -> FastAPI:
     # CORS for React frontend
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000", "http://localhost:5173"],  # React dev servers
+        allow_origins=[
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://localhost:5173",
+        ],  # React dev servers
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -127,12 +131,16 @@ def create_app() -> FastAPI:
 
     # API endpoints organized by capability
     from api.chat import router as chat_router
+    from api.messages import router as messages_router
     from api.trips import router as trips_router
+    from api.users import router as users_router
     from api.webhooks import router as webhooks_router
 
     app.include_router(chat_router, prefix="/api", tags=["Chat"])
-    app.include_router(webhooks_router, prefix="/api/webhooks", tags=["Webhooks"])
+    app.include_router(users_router, prefix="/api/users", tags=["Users"])
     app.include_router(trips_router, prefix="/api/trips", tags=["Trips"])
+    app.include_router(messages_router, prefix="/api/messages", tags=["Messages"])
+    app.include_router(webhooks_router, prefix="/api/webhooks", tags=["Webhooks"])
 
     # Health check endpoint
     @app.get("/health", tags=["System"])

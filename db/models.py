@@ -9,7 +9,7 @@ Comprehensive models for Phase 1:
 """
 
 import uuid
-from datetime import datetime, date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -28,7 +28,6 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base, TimestampMixin
-
 
 # ============================================================================
 # Core Entity Models

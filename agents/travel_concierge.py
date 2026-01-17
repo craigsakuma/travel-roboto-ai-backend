@@ -5,11 +5,10 @@ Handles user-facing chat interactions about trips with tool calling support.
 """
 
 import json
-import uuid
 from pathlib import Path
 from typing import Any
 
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.base import BaseLLM

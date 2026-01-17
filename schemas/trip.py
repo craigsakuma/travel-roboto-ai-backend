@@ -9,7 +9,7 @@ Defines data models for:
 - Consolidated trip data
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -41,11 +41,11 @@ class TripMetadata(BaseModel):
     )
     created_at: Timestamp = Field(
         description="When the trip was created",
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
     )
     updated_at: Timestamp = Field(
         description="Last update timestamp",
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
     )
 
     @field_validator("trip_id")
@@ -284,6 +284,178 @@ class ActivityInfo(BaseModel):
                         "timestamp": "2025-12-12T09:00:00Z",
                         "metadata": {"email_id": "msg_act789"},
                     },
+                }
+            ]
+        }
+    )
+
+
+class TripSyncResponse(BaseModel):
+    """Response schema for trip sync operations."""
+
+    success: bool = Field(
+        description="Whether the sync was successful",
+        examples=[True],
+    )
+    trip_id: str = Field(
+        description="Trip UUID that was synced",
+        examples=["62a88f76-e87d-4084-a89e-fd897b3e4592"],
+    )
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "success": True,
+                    "trip_id": "62a88f76-e87d-4084-a89e-fd897b3e4592",
+                }
+            ]
+        }
+    )
+
+
+class TripDeleteResponse(BaseModel):
+    """Response schema for trip deletion."""
+
+    success: bool = Field(
+        description="Whether the deletion was successful",
+        examples=[True],
+    )
+
+    model_config = ConfigDict(
+        json_schema_extra={"examples": [{"success": True}]}
+    )
+
+
+class TripMemberSyncRequest(BaseModel):
+    """Request schema for syncing trip member data."""
+
+    user_id: str = Field(
+        description="User UUID from Supabase",
+        examples=["6b2e069d-ce69-45dc-96b2-b570680f56b7"],
+    )
+    role: str = Field(
+        description="Member role: 'organizer' or 'traveler'",
+        examples=["traveler"],
+    )
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "user_id": "6b2e069d-ce69-45dc-96b2-b570680f56b7",
+                    "role": "traveler",
+                }
+            ]
+        }
+    )
+
+
+class TripMemberSyncResponse(BaseModel):
+    """Response schema for trip member sync operations."""
+
+    success: bool = Field(
+        description="Whether the sync was successful",
+        examples=[True],
+    )
+    trip_id: str = Field(
+        description="Trip UUID",
+        examples=["62a88f76-e87d-4084-a89e-fd897b3e4592"],
+    )
+    user_id: str = Field(
+        description="User UUID that was synced",
+        examples=["6b2e069d-ce69-45dc-96b2-b570680f56b7"],
+    )
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "success": True,
+                    "trip_id": "62a88f76-e87d-4084-a89e-fd897b3e4592",
+                    "user_id": "6b2e069d-ce69-45dc-96b2-b570680f56b7",
+                }
+            ]
+        }
+    )
+
+
+class TripMemberRemoveResponse(BaseModel):
+    """Response schema for trip member removal."""
+
+    success: bool = Field(
+        description="Whether the removal was successful",
+        examples=[True],
+    )
+
+    model_config = ConfigDict(
+        json_schema_extra={"examples": [{"success": True}]}
+    )
+
+
+class TripSyncRequest(BaseModel):
+    """
+    Request schema for syncing trip data from Supabase to backend.
+
+    Used by POST /api/trips/sync endpoint to sync trip data
+    from the frontend (Supabase) to the backend database.
+    """
+
+    id: str = Field(
+        description="Trip UUID from Supabase",
+        examples=["62a88f76-e87d-4084-a89e-fd897b3e4592"],
+    )
+    name: str = Field(
+        description="Trip name",
+        examples=["SF Fall Trip"],
+    )
+    destination: str = Field(
+        description="Trip destination",
+        examples=["San Francisco, CA"],
+    )
+    start_date: str = Field(
+        description="Trip start date (YYYY-MM-DD or ISO 8601)",
+        examples=["2026-09-04"],
+    )
+    end_date: str = Field(
+        description="Trip end date (YYYY-MM-DD or ISO 8601)",
+        examples=["2026-10-05"],
+    )
+    created_by_user_id: str = Field(
+        description="User UUID from Supabase who created the trip",
+        examples=["6b2e069d-ce69-45dc-96b2-b570680f56b7"],
+    )
+
+    @field_validator("id", "created_by_user_id")
+    @classmethod
+    def validate_uuid(cls, v: str) -> str:
+        """Validate UUID format."""
+        import uuid as uuid_lib
+
+        try:
+            uuid_lib.UUID(v)
+        except ValueError:
+            raise ValueError(f"Invalid UUID format: {v}")
+        return v
+
+    @field_validator("name", "destination")
+    @classmethod
+    def string_not_empty(cls, v: str) -> str:
+        """Ensure required string fields are not empty."""
+        if not v or not v.strip():
+            raise ValueError("Field cannot be empty")
+        return v.strip()
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "id": "62a88f76-e87d-4084-a89e-fd897b3e4592",
+                    "name": "SF Fall Trip",
+                    "destination": "San Francisco, CA",
+                    "start_date": "2026-09-04",
+                    "end_date": "2026-10-05",
+                    "created_by_user_id": "6b2e069d-ce69-45dc-96b2-b570680f56b7",
                 }
             ]
         }

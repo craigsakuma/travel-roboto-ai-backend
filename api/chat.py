@@ -5,7 +5,7 @@ Provides POST /chat endpoint for conversational travel assistance.
 """
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from langchain_core.messages import AIMessage, HumanMessage
@@ -14,8 +14,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from agents import TravelConciergeAgent
 from config import Settings, get_settings
-from db.session import get_db
 from db.models import Conversation, Message
+from db.session import get_db
 from models.factory import get_llm_factory
 from schemas.messages import ChatRequest, ChatResponse
 from tools import ToolRegistry, register_trip_tools
@@ -95,7 +95,7 @@ async def chat(
         return ChatResponse(
             message=response_text,
             conversation_id=str(conversation_id),
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             sources=None,  # TODO: Populate sources from tool calls in Phase 2
             model_used=f"{metadata['model_info']['provider']}:{metadata['model_info']['model']}",
             metadata={
@@ -240,7 +240,7 @@ async def _save_messages(
 
     # Update conversation turn number
     conversation.next_turn_number += 2
-    conversation.updated_at = datetime.now(timezone.utc)
+    conversation.updated_at = datetime.now(UTC)
 
     await db.commit()
 
